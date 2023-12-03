@@ -1,63 +1,12 @@
-const http = require("http")
+const express = require("express")
+const dotenv = require("dotenv")
 
+const app = express();
 
-const todos = [
-  {id: 1, text: "todo one"},
-  {id: 2, text: "todo two"}
-]
+// config env
+dotenv.config({ path: "config/.env" })
 
+const PORT = process.env.PORT || 5000
 
-const app = http.createServer((req, res) => {
-  
-  let body = []
+app.listen(PORT, console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}` ))
 
-  req.on('data', chunk => {
-    body.push(chunk)
-  }).on('close',() => {
-
-    let status = 404
-    let response = {
-      success: false,
-      data: null,
-      error: "Not found resource"
-    }
-
-
-    if(req.method === "GET" && req.url === "/todos"){
-      status = 200
-      response.success = true
-      response.data = todos
-      response.error = null
-    }else if(req.method === "POST" && req.url === "/todos"){
-      let todo = JSON.parse(body)
-
-
-      if(!todo.id || !todo.text){
-        status = 400
-        response.success = false
-        response.error = "Please type id and text"
-
-      }else{
-        todos.push(todo)
-        status = 201
-        response.success = true
-        response.data = todos
-        response.error = null
-      }
-     
-    }
-
-    res.writeHead(status, {
-      'Content-Type': 'application/json',
-      'X-Powered-By': 'Node.js'
-    })
-    res.end(JSON.stringify(response));
-
-
-  })
-})
-
-
-const PORT = 5000;
-
-app.listen(PORT, () => console.log("Server run"))
