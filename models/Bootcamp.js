@@ -106,5 +106,8 @@ BootcampSchema.pre("save", function(next) {
 })
 
 
+// Geocode and create location filed
+
+
 
 module.exports = mongoose.model('Bootcamp', BootcampSchema)
