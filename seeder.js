@@ -2,7 +2,6 @@ const fs = require("fs")
 const Bootcamp = require("./models/Bootcamp")
 const mongoose = require("mongoose")
 const colors = require("colors")
-const path = require("path")
 const dotenv = require("dotenv")
 
 
