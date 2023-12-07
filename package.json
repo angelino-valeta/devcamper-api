@@ -4,7 +4,8 @@
   "description": "Nodejs API Masterclass",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "seeder": "node seeder.js -i",
+    "destroy-data": "node seeder.js -d",
     "start": "NODE_ENV=production node server.js",
     "dev": "nodemon server.js"
   },
