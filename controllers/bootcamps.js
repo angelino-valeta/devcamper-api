@@ -71,7 +71,7 @@ exports.updateBootcamp = asyncHandler(async (req, res, next) => {
 exports.deleteBootcamp = asyncHandler(async (req, res, next) => {
   let data = await Bootcamp.findById(req.params.id)
   if (!data) {
-    return next(new ErrorResponse(`Resource not found with id of ${req.params.id}`))
+    return next(new ErrorResponse(`Resource not found with id of ${req.params.id}`, 404))
   }
   await Bootcamp.findByIdAndDelete(req.params.id)
   res.status(200).json({
@@ -88,9 +88,8 @@ exports.getBootcampsInRadius = asyncHandler(async (req, res, next) => {
 
   const { zipcode, distance, unit } = req.params
 
-  let earthRadius = 6478
-  if( unit === "mi") earthRadius = 3963
-
+  const earthRadius = validateUnitEarthRadius({ next, unit })
+  
   const location = await geocoder.geocode(zipcode)
   const geoLocation = {
     latitude: location[0].latitude,
@@ -105,10 +104,10 @@ exports.getBootcampsInRadius = asyncHandler(async (req, res, next) => {
 
   const data = await Bootcamp.find({
     location: {
-      $geoWithin: { $centerSphere: [[ geoLocation.longitude, geoLocation.latitude ], radius]}
+      $geoWithin: { $centerSphere: [[geoLocation.longitude, geoLocation.latitude], radius] }
     }
   })
-  
+
   await Bootcamp.findByIdAndDelete(req.params.id)
   res.status(200).json({
     success: true,
@@ -116,3 +115,14 @@ exports.getBootcampsInRadius = asyncHandler(async (req, res, next) => {
     data
   })
 })
+
+
+function validateUnitEarthRadius({ next, unit }) {
+  let earthRadius
+  if (unit === "km" || unit === "mi") {
+    if (unit === "mi") earthRadius = 3963
+    if (unit === "km") earthRadius = 6478
+    return earthRadius
+  }
+  return next(new Error(`Unit is required: Km or mi`), 400)
+}
